@@ -129,9 +129,9 @@ class Paddle:
         else:
             self.y = 0
     def let_right_Release(self, event):
-        self.x *= 0.2
+        self.x *= 0.3
     def up_down_Release(self, event):
-        self.y *= 0.2
+        self.y *= 0.3
 
 
 paddle = Paddle(canvas,"green")
