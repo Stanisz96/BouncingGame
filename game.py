@@ -1,4 +1,5 @@
 from tkinter import *
+import tkinter.messagebox
 import time
 
 # Main window of an application
@@ -69,7 +70,10 @@ class Ball:
         if ball_pos[1] <= 0:
             self.y = 4
         if ball_pos[3] >= self.canvas_height:
-            self.y = -4
+            self.canvas.coords(self.id,[244,144,256, 156])
+            self.x = 0
+            self.y = 0
+            tkinter.messagebox.showinfo(message="GAME OVER!")
         if ball_pos[0] <= 0:
             self.x = 4
         if ball_pos[2] >= self.canvas_width:
