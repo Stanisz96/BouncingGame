@@ -45,10 +45,11 @@ class Ball:
     def __init__(self,canvas,color,paddle):
         self.canvas = canvas
         self.paddle = paddle
-        self.id = canvas.create_oval(0,0,14,14, fill=color)
+        self.id = canvas.create_oval(0,0,12,12, fill=color)
         self.canvas.move(self.id,243,93)
         self.x = 4
         self.y = -4
+        self.change_dir = False
         self.canvas_height = self.canvas.winfo_height()
         self.canvas_width = self.canvas.winfo_width()
 
@@ -56,10 +57,11 @@ class Ball:
         ball_pos = self.canvas.coords(self.id)
         paddle_pos = self.paddle.canvas.coords(self.paddle.id)
         if ball_pos[3] >= paddle_pos[1] and ball_pos[3] <= paddle_pos[3]:
-            if ball_pos[2] >= paddle_pos[0] and ball_pos[0] <= paddle_pos[2]:
-                self.y *= -3
+            if ball_pos[2] >= paddle_pos[0] and ball_pos[0] <= paddle_pos[2] and self.change_dir == False:
+                self.y *= -1
+                self.change_dir = True
             else: pass
-        else: pass
+        else: self.change_dir = False
 
     def draw(self):
         self.canvas.move(self.id,self.x,self.y)
@@ -140,8 +142,8 @@ ball = Ball(canvas,"red",paddle)
 
 while x == True:
     ball.hit_paddle()
-    ball.draw()
     paddle.draw()
+    ball.draw()
     root.update_idletasks()
     root.update()
     time.sleep(0.02)
