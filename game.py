@@ -1,6 +1,7 @@
 from tkinter import *
 import tkinter.messagebox
 import time
+import random
 
 # Main window of an application
 root = Tk()
@@ -23,17 +24,20 @@ topFrame.pack(pady=2)
 
 #Top frame contains
 ##Score information
-label1 = Label(topFrame, text="SCORE:",height=2,width=15,relief=RIDGE).grid(row=0,column=0,sticky=W)
-label2 = Label(topFrame, text="H.SCORE:",height=2,width=15,relief=RIDGE).grid(row=1,column=0,sticky=W)
-label3 = Label(topFrame, text="XX",height=2,width=14,anchor=W,relief=RIDGE,padx=4).grid(row=0,column=1,sticky=W)
-label4 = Label(topFrame, text="YY",height=2,width=14,anchor=W,relief=RIDGE,padx=4).grid(row=1,column=1,sticky=W)
-##Separation
-label = Label(topFrame,height=4,width=8,bg="green",pady=3).grid(row=0,column=2,rowspan=2)
+label1 = Label(topFrame, text="SCORE:",height=2,width=9,relief=SUNKEN).grid(row=0,column=0)
+label2 = Label(topFrame, text="H.SCORE:",height=2,width=9,relief=SUNKEN).grid(row=1,column=0)
+label3 = Label(topFrame, text="XX",height=2,width=12,anchor=W,relief=SUNKEN,padx=4).grid(row=0,column=1)
+label4 = Label(topFrame, text="YY",height=2,width=12,anchor=W,relief=SUNKEN,padx=4).grid(row=1,column=1)
+##New Game
+button1 = Button(topFrame,width=24,bg="#F7D952",pady=8,text="NEW GAME",relief=GROOVE).grid(row=0,column=2,columnspan=2)
+##Speed and points information
+label5 = Label(topFrame, text=" SPEED:",height=2,width=12,relief=GROOVE,anchor=W).grid(row=1,column=2)
+label6 = Label(topFrame, text=" POINTS:",height=2,width=12,relief=GROOVE,anchor=W).grid(row=1,column=3)
 ##Level information
-label5 = Label(topFrame, text="LEVEL:",height=2,width=15,relief=RIDGE).grid(row=0,column=3,sticky=E)
-label6 = Label(topFrame, text="H.LEVEL:",height=2,width=15,relief=RIDGE).grid(row=1,column=3,sticky=E)
-label7 = Label(topFrame, text="XX",height=2,width=14,anchor=W,relief=RIDGE,padx=4).grid(row=0,column=4,sticky=E)
-label8 = Label(topFrame, text="YY",height=2,width=14,anchor=W,relief=RIDGE,padx=4).grid(row=1,column=4,sticky=E)
+label7 = Label(topFrame, text="LEVEL:",height=2,width=9,relief=SUNKEN).grid(row=0,column=4)
+label8 = Label(topFrame, text="H.LEVEL:",height=2,width=9,relief=SUNKEN).grid(row=1,column=4)
+label9 = Label(topFrame, text="XX",height=2,width=12,anchor=W,relief=SUNKEN,padx=4).grid(row=0,column=5)
+label10 = Label(topFrame, text="YY",height=2,width=12,anchor=W,relief=SUNKEN,padx=4).grid(row=1,column=5)
 
 
 # Canvas for game
@@ -46,10 +50,10 @@ class Ball:
     def __init__(self,canvas,color,paddle):
         self.canvas = canvas
         self.paddle = paddle
-        self.id = canvas.create_oval(0,0,12,12, fill=color)
-        self.canvas.move(self.id,243,93)
-        self.x = 4
-        self.y = -4
+        self.id = canvas.create_oval(244,44,256,56, fill=color)
+        #self.canvas.move(self.id,43,93)
+        self.x = random.choice([-4,4])
+        self.y = random.choice([-4,4])
         self.change_dir = False
         self.canvas_height = self.canvas.winfo_height()
         self.canvas_width = self.canvas.winfo_width()
@@ -58,7 +62,7 @@ class Ball:
         ball_pos = self.canvas.coords(self.id)
         paddle_pos = self.paddle.canvas.coords(self.paddle.id)
         if ball_pos[3] >= paddle_pos[1] and ball_pos[3] <= paddle_pos[3]:
-            if ball_pos[2] >= paddle_pos[0] and ball_pos[0] <= paddle_pos[2] and self.change_dir == False:
+            if ball_pos[2] >= paddle_pos[0]+6 and ball_pos[0] <= paddle_pos[2]-6 and self.change_dir == False:
                 self.y *= -1
                 self.change_dir = True
             else: pass
@@ -70,7 +74,7 @@ class Ball:
         if ball_pos[1] <= 0:
             self.y = 4
         if ball_pos[3] >= self.canvas_height:
-            self.canvas.coords(self.id,[244,144,256, 156])
+            self.canvas.coords(self.id,[244,44,256, 56])
             self.x = 0
             self.y = 0
             tkinter.messagebox.showinfo(message="GAME OVER!")
