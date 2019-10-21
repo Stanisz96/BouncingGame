@@ -7,16 +7,26 @@ import random
 class Stats:
     def __init__(self):
         self.score = StringVar()
-        self.score.set(eval('0'))
+        self.score.set('0')
         self.speed = StringVar()
-        self.speed.set(eval('4'))
+        self.speed.set('40')
         self.level = StringVar()
-        self.level.set(eval('10'))
+        self.level.set('0')
+        self.points = StringVar()
+        self.points.set('10')
+    def reset(self):
+        self.score.set('0')
+        self.speed.set('40')
+        self.level.set('0')
+        self.points.set('10')
 
     def addPoints(self):
-        self.score.set(str(int(self.score.get()) + 10))
-    #def levelUp(self):
-    #    self.speed.set(str(self.speed.get() + 0.1))
+        self.score.set(str(int(self.score.get()) + int(self.points.get())))
+    def levelUp(self):
+        self.speed.set(str(int(self.speed.get()) + 1))
+        self.points.set(str(int(self.points.get()) + 2))
+        self.level.set(str(int(self.level.get()) + 1))
+        self.level_up = False
 
 
 class GUI(Stats):
@@ -41,21 +51,20 @@ class GUI(Stats):
         self.new_Game = True
         self.button1 = Button(self.topFrame,width=16,bg="#F7D952",height=1,pady=6,text="NEW GAME",relief=GROOVE,command=self.newGame).grid(row=0,column=2,columnspan=4)
         ##Level up
-        self.button2 = Button(self.topFrame, width=8, bg="#4DE67C",height=1,pady=6, text="LevelUp",wraplength=34, relief=GROOVE,command=self.newGame).grid(row=0, column=6,columnspan=2)
-
+        self.button2 = Button(self.topFrame, width=8, bg="#4DE67C",height=1,pady=6, text="LevelUp",wraplength=34, relief=GROOVE,command=self.stats.levelUp).grid(row=0, column=6,columnspan=2)
         ##Speed and points information
         self.label5 = Label(self.topFrame, text="SPEED",height=2,width=8,relief=GROOVE).grid(row=1,column=2,columnspan=2)
         self.label5_2 = Label(self.topFrame,textvariable=self.stats.speed,height=2,width=4,relief=GROOVE).grid(row=1,column=4)
         self.label6 = Label(self.topFrame, text="POINTS",height=2,width=8,relief=GROOVE).grid(row=1,column=5,columnspan=2)
-        self.label6_2 = Label(self.topFrame,textvariable=self.stats.level,height=2,width=4,relief=GROOVE).grid(row=1,column=7)
+        self.label6_2 = Label(self.topFrame,textvariable=self.stats.points,height=2,width=4,relief=GROOVE).grid(row=1,column=7)
         ##Level information
         self.label7 = Label(self.topFrame, text="LEVEL:",height=2,width=9,relief=SUNKEN).grid(row=0,column=8)
         self.label8 = Label(self.topFrame, text="H.LEVEL:",height=2,width=9,relief=SUNKEN).grid(row=1,column=8)
-        self.label9 = Label(self.topFrame, text="XX",height=2,width=10,anchor=W,relief=SUNKEN,padx=4).grid(row=0,column=9)
+        self.label9 = Label(self.topFrame, textvariable=self.stats.level,height=2,width=10,anchor=W,relief=SUNKEN,padx=4).grid(row=0,column=9)
         self.label10 = Label(self.topFrame, text="YY",height=2,width=10,anchor=W,relief=SUNKEN,padx=4).grid(row=1,column=9)
 
         # Canvas for game
-        self.canvas = Canvas(self.master, width=500,height=500,bd=2,highlightthickness=1,bg="#E7DEFB",highlightbackground="#8BA16E",relief=SUNKEN)
+        self.canvas = Canvas(self.master, width=500,height=550,bd=2,highlightthickness=1,bg="#E7DEFB",highlightbackground="#8BA16E",relief=SUNKEN)
         self.canvas.pack()
 
     def update_x(self):
@@ -65,14 +74,15 @@ class GUI(Stats):
         self.new_Game = True
 
 
-class Ball:
-    def __init__(self,canvas,color,paddle):
+class Ball(Stats):
+    def __init__(self, canvas, color, paddle, stats):
+        super().__init__()
+        self.stats = stats
         self.canvas = canvas
         self.paddle = paddle
         self.id = canvas.create_oval(244,44,256,56, fill=color)
-        #self.canvas.move(self.id,43,93)
-        self.x = random.choice([-4,4])
-        self.y = random.choice([-4,4])
+        self.x = random.choice([-int(self.stats.speed.get()) / 10,int(self.stats.speed.get()) / 10])
+        self.y = random.choice([-int(self.stats.speed.get()) / 10,int(self.stats.speed.get()) / 10])
         self.change_dir = False
         self.add_points = False
         self.canvas_height = self.canvas.winfo_height()
@@ -96,16 +106,16 @@ class Ball:
         self.canvas.move(self.id,self.x,self.y)
         ball_pos = self.canvas.coords(self.id)
         if ball_pos[1] <= 0:
-            self.y = 4
+            self.y = int(self.stats.speed.get()) / 10
         if ball_pos[3] >= self.canvas_height:
-            self.canvas.coords(self.id,[244,44,256, 56])
+            self.canvas.coords(self.id,[244,44,256,56])
             self.x = 0
             self.y = 0
             tkinter.messagebox.showinfo(message="GAME OVER!")
         if ball_pos[0] <= 0:
-            self.x = 4
+            self.x = int(self.stats.speed.get()) / 10
         if ball_pos[2] >= self.canvas_width:
-            self.x = -4
+            self.x = -int(self.stats.speed.get()) / 10
 
 
 class Paddle:
@@ -200,15 +210,19 @@ gui = GUI(root, stats)
 root.update()
 #Create paddle and ball
 paddle = Paddle(gui.canvas,"green")
-ball = Ball(gui.canvas,"red",paddle)
+ball = Ball(gui.canvas,"red",paddle,stats)
 
 
 while gui.x == True:
     if gui.new_Game == True:
+        #delate objects and reset variable
         del ball, paddle
         gui.canvas.delete("all")
+        stats.reset()
+        print("yolo")
+        #create new objects
         paddle = Paddle(gui.canvas, "green")
-        ball = Ball(gui.canvas, "red", paddle)
+        ball = Ball(gui.canvas, "red", paddle,stats)
         gui.new_Game = False
     ball.hit_paddle()
     if ball.add_points == True:
