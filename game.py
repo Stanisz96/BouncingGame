@@ -1,7 +1,10 @@
 from tkinter import *
 import tkinter.messagebox
 import time
+import datetime
 import random
+import pandas as pd
+
 
 
 class Stats:
@@ -14,6 +17,11 @@ class Stats:
         self.level.set('0')
         self.points = StringVar()
         self.points.set('10')
+        self.h_score = StringVar()
+        self.h_score.set('0')
+        self.h_level = StringVar()
+        self.h_level.set('0')
+
     def reset(self):
         self.score.set('0')
         self.speed.set('40')
@@ -27,7 +35,30 @@ class Stats:
         self.points.set(str(int(self.points.get()) + 2))
         self.level.set(str(int(self.level.get()) + 1))
         self.level_up = False
+    def updateStats(self):
+        if int(self.score.get()) > int(self.h_score.get()):
+            self.h_score.set(self.score.get())
+        if int(self.level.get()) > int(self.h_level.get()):
+            self.h_level.set(self.level.get())
 
+    def readData(self):
+        try:
+            file = pd.read_table('data.csv',delimiter=',')
+            self.h_score.set(file.get('Score').max())
+            self.h_level.set(file.get('Level').max())
+        except:
+            file = pd.DataFrame({'Score': [self.score.get()],
+                                'Level': [self.level.get()],
+                                'Data': [datetime.date.today()]})
+            file.to_csv("data.csv",index=False)
+    def saveData(self):
+        try:
+            file = pd.DataFrame({'Score': [self.score.get()],
+                                 'Level': [self.level.get()],
+                                 'Data': [datetime.date.today()]})
+            file.to_csv("data.csv", index=False, mode='a', header=False)
+        except:
+            print("ERROR!")
 
 class GUI(Stats):
     def __init__(self, master, stats):
@@ -46,7 +77,7 @@ class GUI(Stats):
         self.label1 = Label(self.topFrame, text="SCORE:",height=2,width=8,relief=SUNKEN).grid(row=0,column=0)
         self.label2 = Label(self.topFrame, text="H.SCORE:",height=2,width=8,relief=SUNKEN).grid(row=1,column=0)
         self.label3 = Label(self.topFrame, textvariable=self.stats.score,height=2,width=12,anchor=W,relief=SUNKEN,padx=4).grid(row=0,column=1)
-        self.label4 = Label(self.topFrame, text="YY",height=2,width=12,anchor=W,relief=SUNKEN,padx=4).grid(row=1,column=1)
+        self.label4 = Label(self.topFrame, textvariable=self.stats.h_score,height=2,width=12,anchor=W,relief=SUNKEN,padx=4).grid(row=1,column=1)
         ##New Game
         self.new_Game = True
         self.button1 = Button(self.topFrame,width=16,bg="#F7D952",height=1,pady=6,text="NEW GAME",relief=GROOVE,command=self.newGame).grid(row=0,column=2,columnspan=4)
@@ -61,7 +92,7 @@ class GUI(Stats):
         self.label7 = Label(self.topFrame, text="LEVEL:",height=2,width=9,relief=SUNKEN).grid(row=0,column=8)
         self.label8 = Label(self.topFrame, text="H.LEVEL:",height=2,width=9,relief=SUNKEN).grid(row=1,column=8)
         self.label9 = Label(self.topFrame, textvariable=self.stats.level,height=2,width=10,anchor=W,relief=SUNKEN,padx=4).grid(row=0,column=9)
-        self.label10 = Label(self.topFrame, text="YY",height=2,width=10,anchor=W,relief=SUNKEN,padx=4).grid(row=1,column=9)
+        self.label10 = Label(self.topFrame, textvariable=self.stats.h_level,height=2,width=10,anchor=W,relief=SUNKEN,padx=4).grid(row=1,column=9)
 
         # Canvas for game
         self.canvas = Canvas(self.master, width=500,height=550,bd=2,highlightthickness=1,bg="#E7DEFB",highlightbackground="#8BA16E",relief=SUNKEN)
@@ -111,6 +142,7 @@ class Ball(Stats):
             self.canvas.coords(self.id,[244,44,256,56])
             self.x = 0
             self.y = 0
+            self.stats.saveData()
             tkinter.messagebox.showinfo(message="GAME OVER!")
         if ball_pos[0] <= 0:
             self.x = int(self.stats.speed.get()) / 10
@@ -206,6 +238,7 @@ root.wm_attributes('-topmost', 1)
 
 #Create gui and stats object
 stats = Stats()
+stats.readData()
 gui = GUI(root, stats)
 root.update()
 #Create paddle and ball
@@ -219,7 +252,6 @@ while gui.x == True:
         del ball, paddle
         gui.canvas.delete("all")
         stats.reset()
-        print("yolo")
         #create new objects
         paddle = Paddle(gui.canvas, "green")
         ball = Ball(gui.canvas, "red", paddle,stats)
@@ -227,6 +259,7 @@ while gui.x == True:
     ball.hit_paddle()
     if ball.add_points == True:
         stats.addPoints()
+        stats.updateStats()
     paddle.draw()
     ball.draw()
     gui.master.update_idletasks()
