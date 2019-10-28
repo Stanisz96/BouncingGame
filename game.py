@@ -7,6 +7,8 @@ import pandas as pd
 
 
 
+
+
 class Stats:
     def __init__(self):
         self.score = StringVar()
@@ -69,33 +71,41 @@ class GUI(Stats):
         self.x = True
         self.master.protocol("WM_DELETE_WINDOW", self.update_x)
         # Top frame with informations
-        self.topFrame = Frame(self.master,bd=3, relief=GROOVE)
-        self.topFrame.pack(pady=2)
+        self.topFrame = Frame(self.master,bd=1,bg='#304366')
+        self.topFrame.pack(fill=X)
 
         #Top frame contains
+        ## border
+        self.border1 = Label(self.topFrame, bg='#304366', width=5).grid(row=0,rowspan=2, column=0)
         ##Score information
-        self.label1 = Label(self.topFrame, text="SCORE:",height=2,width=8,relief=SUNKEN).grid(row=0,column=0)
-        self.label2 = Label(self.topFrame, text="H.SCORE:",height=2,width=8,relief=SUNKEN).grid(row=1,column=0)
-        self.label3 = Label(self.topFrame, textvariable=self.stats.score,height=2,width=12,anchor=W,relief=SUNKEN,padx=4).grid(row=0,column=1)
-        self.label4 = Label(self.topFrame, textvariable=self.stats.h_score,height=2,width=12,anchor=W,relief=SUNKEN,padx=4).grid(row=1,column=1)
+        self.label1 = Label(self.topFrame, image=image03,bd=1,activebackground='#162032',bg='#304366',relief='groove').grid(row=0,column=1,sticky='nswe')
+        self.label2 = Label(self.topFrame, image=image04,bd=1,activebackground='#162032',bg='#304366',relief='groove').grid(row=1,column=1,sticky='nswe')
+        self.label3 = Label(self.topFrame, textvariable=self.stats.score,width=6,bg='#304366',relief='groove').grid(row=0,column=2)
+        self.label4 = Label(self.topFrame, textvariable=self.stats.h_score,width=6,bg='#304366',relief='groove').grid(row=1,column=2)
         ##New Game
         self.new_Game = True
-        self.button1 = Button(self.topFrame,width=16,bg="#F7D952",height=1,pady=6,text="NEW GAME",relief=GROOVE,command=self.newGame).grid(row=0,column=2,columnspan=4)
+        self.button1 = Button(self.topFrame,image=image02,command=self.newGame,bd=1,relief='solid',activebackground='#162032',bg='#304366')
+        self.button1.image = image02
+        self.button1.grid(row=0,column=3,columnspan=4,sticky='nswe')
+        ## border
+        self.border2 = Label(self.topFrame,bg='#304366',width=1).grid(row=0,column=7)
         ##Level up
-        self.button2 = Button(self.topFrame, width=8, bg="#4DE67C",height=1,pady=6, text="LevelUp",wraplength=34, relief=GROOVE,command=self.stats.levelUp).grid(row=0, column=6,columnspan=2)
+        self.button2 = Button(self.topFrame, image=image01,command=self.stats.levelUp,bd=1,relief='solid',activebackground='#162032',bg='#304366')
+        self.button2.image = image01
+        self.button2.grid(row=0, column=8,columnspan=2,sticky='nswe')
         ##Speed and points information
-        self.label5 = Label(self.topFrame, text="SPEED",height=2,width=8,relief=GROOVE).grid(row=1,column=2,columnspan=2)
-        self.label5_2 = Label(self.topFrame,textvariable=self.stats.speed,height=2,width=4,relief=GROOVE).grid(row=1,column=4)
-        self.label6 = Label(self.topFrame, text="POINTS",height=2,width=8,relief=GROOVE).grid(row=1,column=5,columnspan=2)
-        self.label6_2 = Label(self.topFrame,textvariable=self.stats.points,height=2,width=4,relief=GROOVE).grid(row=1,column=7)
+        self.label5 = Label(self.topFrame, image=image05,bd=1,activebackground='#162032',bg='#304366',relief='groove').grid(row=1,column=3,columnspan=2,sticky='nswe')
+        self.label5_2 = Label(self.topFrame,textvariable=self.stats.speed,bg='#304366',relief='groove').grid(row=1,column=5)
+        self.label6 = Label(self.topFrame, image=image06,bd=1,activebackground='#162032',bg='#304366',relief='groove').grid(row=1,column=6,columnspan=3,sticky='nswe')
+        self.label6_2 = Label(self.topFrame,textvariable=self.stats.points,bg='#304366',relief='groove').grid(row=1,column=9)
         ##Level information
-        self.label7 = Label(self.topFrame, text="LEVEL:",height=2,width=9,relief=SUNKEN).grid(row=0,column=8)
-        self.label8 = Label(self.topFrame, text="H.LEVEL:",height=2,width=9,relief=SUNKEN).grid(row=1,column=8)
-        self.label9 = Label(self.topFrame, textvariable=self.stats.level,height=2,width=10,anchor=W,relief=SUNKEN,padx=4).grid(row=0,column=9)
-        self.label10 = Label(self.topFrame, textvariable=self.stats.h_level,height=2,width=10,anchor=W,relief=SUNKEN,padx=4).grid(row=1,column=9)
+        self.label7 = Label(self.topFrame, image=image07,bd=1,activebackground='#162032',bg='#304366',relief='groove').grid(row=0,column=10,sticky='nswe')
+        self.label8 = Label(self.topFrame, image=image08,bd=1,activebackground='#162032',bg='#304366',relief='groove').grid(row=1,column=10,sticky='nswe')
+        self.label9 = Label(self.topFrame, textvariable=self.stats.level,width=5,bg='#304366',relief='groove').grid(row=0,column=11)
+        self.label10 = Label(self.topFrame, textvariable=self.stats.h_level,width=5,bg='#304366',relief='groove').grid(row=1,column=11)
 
         # Canvas for game
-        self.canvas = Canvas(self.master, width=500,height=550,bd=2,highlightthickness=1,bg="#E7DEFB",highlightbackground="#8BA16E",relief=SUNKEN)
+        self.canvas = Canvas(self.master, width=500,height=550,bd=2,highlightthickness=1,bg="#304346",highlightbackground="#8BA16E",relief=SUNKEN)
         self.canvas.pack()
 
     def update_x(self):
@@ -235,6 +245,16 @@ root = Tk()
 root.title("Bounce!")
 root.resizable(0, 0)
 root.wm_attributes('-topmost', 1)
+
+#Images
+image01 = PhotoImage(file="images/levelup.gif")
+image02 = PhotoImage(file="images/newgame.gif")
+image03 = PhotoImage(file="images/score.gif")
+image04 = PhotoImage(file="images/hscore.gif")
+image05 = PhotoImage(file="images/speed.gif")
+image06 = PhotoImage(file="images/points.gif")
+image07 = PhotoImage(file="images/level.gif")
+image08 = PhotoImage(file="images/hlevel.gif")
 
 #Create gui and stats object
 stats = Stats()
