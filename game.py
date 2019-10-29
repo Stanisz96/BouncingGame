@@ -83,7 +83,7 @@ class GUI(Stats):
         ##Score information
         self.label1 = Label(self.canvas1, image=image03,bd=0,activebackground='#162032',bg='#304366').grid(row=0,column=0,sticky='nse')
         self.label2 = Label(self.canvas1, image=image04,bd=0,activebackground='#162032',bg='#304366').grid(row=2,column=0,sticky='nse')
-        self.label3 = Label(self.canvas1, textvariable=self.stats.score,height=2,bg='#304346',relief='ridge',bd=2).grid(row=0,column=1,sticky='nswe')
+        self.label3 = Label(self.canvas1, textvariable=self.stats.score,height=2,bg='#304346',relief='ridge',bd=2,width=8).grid(row=0,column=1,sticky='nswe')
         self.label4 = Label(self.canvas1, textvariable=self.stats.h_score,bg='#304346',relief='ridge',bd=2).grid(row=2,column=1,sticky='nswe')
         #Border
         self.border4 = Label(self.canvas1, bg='#304366',image=image10).grid(row=0,rowspan=3, column=2)
@@ -99,7 +99,7 @@ class GUI(Stats):
         self.button2.image = image01
         self.button2.grid(row=0, column=8,columnspan=2,sticky='nswe')
         ##border
-        self.border6 = Label(self.canvas1, bg='#304366', image=image12).grid(row=1, column=11, columnspan=3,sticky='nswe')
+        self.border6 = Label(self.canvas1, bg='#304366', image=image12).grid(row=1, column=11, columnspan=3,sticky='nse')
         self.border7 = Label(self.canvas1, bg='#304366', image=image12).grid(row=1, column=0, columnspan=2,sticky='nswe')
         self.border3 = Label(self.canvas1,bg='#304366',image=image11).grid(row=1,column=3,columnspan=7,sticky='nswe')
         ## border
@@ -110,13 +110,13 @@ class GUI(Stats):
         self.label6 = Label(self.canvas1, image=image06,bd=0,activebackground='#162032',bg='#304366').grid(row=2,column=6,columnspan=3,sticky='nswe')
         self.label6_2 = Label(self.canvas1,textvariable=self.stats.points,bg='#304346',relief='ridge',bd=2).grid(row=2,column=9,sticky='nswe')
         ##Level information
-        self.label7 = Label(self.canvas1, image=image07,bd=0,activebackground='#162032',bg='#304366').grid(row=0,column=11,sticky='nse')
-        self.label8 = Label(self.canvas1, image=image08,bd=0,activebackground='#162032',bg='#304366').grid(row=2,column=11,sticky='nse')
-        self.label9 = Label(self.canvas1, textvariable=self.stats.level,bg='#304346',relief='ridge',bd=2).grid(row=0,column=12,sticky='nswe')
-        self.label10 = Label(self.canvas1, textvariable=self.stats.h_level,bg='#304346',relief='ridge',bd=2).grid(row=2,column=12,sticky='nswe')
+        self.label7 = Label(self.canvas1, image=image07,bd=0,activebackground='#162032',bg='#304366').grid(row=0,column=11,sticky='nswe')
+        self.label8 = Label(self.canvas1, image=image08,bd=0,activebackground='#162032',bg='#304366').grid(row=2,column=11,sticky='nswe')
+        self.label9 = Label(self.canvas1, textvariable=self.stats.level,bg='#304346',relief='ridge',bd=2,width=8).grid(row=0,column=12,columnspan=2,sticky='nswe')
+        self.label10 = Label(self.canvas1, textvariable=self.stats.h_level,bg='#304346',relief='ridge',bd=2).grid(row=2,column=12,columnspan=2,sticky='nswe')
         ## border
-        self.border8 = Label(self.canvas1, bg='#304366',bd=0).grid(row=0,column=13,sticky='nswe')
-        self.border9 = Label(self.canvas1, bg='#304366',bd=0).grid(row=2, column=13, sticky='nswe')
+        #self.border8 = Label(self.canvas1, bg='#304366',bd=0).grid(row=0,column=13,sticky='nswe')
+        #self.border9 = Label(self.canvas1, bg='#304366',bd=0,width=4).grid(row=2, column=13, sticky='nswe')
         # Canvas for game
         self.canvas = Canvas(self.master, width=500,height=550,bd=2,highlightthickness=1,bg="#304346",highlightbackground="#8BA16E",relief=SUNKEN)
         self.canvas.pack()
