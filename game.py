@@ -1,4 +1,5 @@
 from tkinter import *
+from PIL import ImageTk,Image
 import tkinter.messagebox
 import time
 import datetime
@@ -73,37 +74,49 @@ class GUI(Stats):
         # Top frame with informations
         self.topFrame = Frame(self.master,bd=1,bg='#304366')
         self.topFrame.pack(fill=X)
-
+        # Canvas for image background
+        self.canvas1 = Canvas(self.topFrame, bd=0, highlightthickness=0, bg='#304366')
+        self.canvas1.pack()
         #Top frame contains
         ## border
-        self.border1 = Label(self.topFrame, bg='#304366', width=5).grid(row=0,rowspan=2, column=0)
+        #self.border1 = Label(self.canvas1, bg='#304366', width=1).grid(row=0,rowspan=3, column=0)
         ##Score information
-        self.label1 = Label(self.topFrame, image=image03,bd=1,activebackground='#162032',bg='#304366',relief='groove').grid(row=0,column=1,sticky='nswe')
-        self.label2 = Label(self.topFrame, image=image04,bd=1,activebackground='#162032',bg='#304366',relief='groove').grid(row=1,column=1,sticky='nswe')
-        self.label3 = Label(self.topFrame, textvariable=self.stats.score,width=6,bg='#304366',relief='groove').grid(row=0,column=2)
-        self.label4 = Label(self.topFrame, textvariable=self.stats.h_score,width=6,bg='#304366',relief='groove').grid(row=1,column=2)
+        self.label1 = Label(self.canvas1, image=image03,bd=0,activebackground='#162032',bg='#304366').grid(row=0,column=0,sticky='nse')
+        self.label2 = Label(self.canvas1, image=image04,bd=0,activebackground='#162032',bg='#304366').grid(row=2,column=0,sticky='nse')
+        self.label3 = Label(self.canvas1, textvariable=self.stats.score,height=2,bg='#304346',relief='ridge',bd=2).grid(row=0,column=1,sticky='nswe')
+        self.label4 = Label(self.canvas1, textvariable=self.stats.h_score,bg='#304346',relief='ridge',bd=2).grid(row=2,column=1,sticky='nswe')
+        #Border
+        self.border4 = Label(self.canvas1, bg='#304366',image=image10).grid(row=0,rowspan=3, column=2)
         ##New Game
         self.new_Game = True
-        self.button1 = Button(self.topFrame,image=image02,command=self.newGame,bd=1,relief='solid',activebackground='#162032',bg='#304366')
+        self.button1 = Button(self.canvas1,image=image02,command=self.newGame,bd=0,relief='solid',activebackground='#162032',bg='#304366')
         self.button1.image = image02
         self.button1.grid(row=0,column=3,columnspan=4,sticky='nswe')
         ## border
-        self.border2 = Label(self.topFrame,bg='#304366',width=1).grid(row=0,column=7)
+        self.border2 = Label(self.canvas1,bg='#304366').grid(row=0,column=7)
         ##Level up
-        self.button2 = Button(self.topFrame, image=image01,command=self.stats.levelUp,bd=1,relief='solid',activebackground='#162032',bg='#304366')
+        self.button2 = Button(self.canvas1, image=image01,command=self.stats.levelUp,bd=0,relief='solid',activebackground='#162032',bg='#304366')
         self.button2.image = image01
         self.button2.grid(row=0, column=8,columnspan=2,sticky='nswe')
+        ##border
+        self.border6 = Label(self.canvas1, bg='#304366', image=image12).grid(row=1, column=11, columnspan=3,sticky='nswe')
+        self.border7 = Label(self.canvas1, bg='#304366', image=image12).grid(row=1, column=0, columnspan=2,sticky='nswe')
+        self.border3 = Label(self.canvas1,bg='#304366',image=image11).grid(row=1,column=3,columnspan=7,sticky='nswe')
+        ## border
+        self.border5 = Label(self.canvas1, bg='#304366',image=image10).grid(row=0,rowspan=3, column=10)
         ##Speed and points information
-        self.label5 = Label(self.topFrame, image=image05,bd=1,activebackground='#162032',bg='#304366',relief='groove').grid(row=1,column=3,columnspan=2,sticky='nswe')
-        self.label5_2 = Label(self.topFrame,textvariable=self.stats.speed,bg='#304366',relief='groove').grid(row=1,column=5)
-        self.label6 = Label(self.topFrame, image=image06,bd=1,activebackground='#162032',bg='#304366',relief='groove').grid(row=1,column=6,columnspan=3,sticky='nswe')
-        self.label6_2 = Label(self.topFrame,textvariable=self.stats.points,bg='#304366',relief='groove').grid(row=1,column=9)
+        self.label5 = Label(self.canvas1, image=image05,bd=0,activebackground='#162032',bg='#304366').grid(row=2,column=3,columnspan=2,sticky='nswe')
+        self.label5_2 = Label(self.canvas1,textvariable=self.stats.speed,bg='#304346',relief='ridge',bd=2).grid(row=2,column=5,sticky='nswe')
+        self.label6 = Label(self.canvas1, image=image06,bd=0,activebackground='#162032',bg='#304366').grid(row=2,column=6,columnspan=3,sticky='nswe')
+        self.label6_2 = Label(self.canvas1,textvariable=self.stats.points,bg='#304346',relief='ridge',bd=2).grid(row=2,column=9,sticky='nswe')
         ##Level information
-        self.label7 = Label(self.topFrame, image=image07,bd=1,activebackground='#162032',bg='#304366',relief='groove').grid(row=0,column=10,sticky='nswe')
-        self.label8 = Label(self.topFrame, image=image08,bd=1,activebackground='#162032',bg='#304366',relief='groove').grid(row=1,column=10,sticky='nswe')
-        self.label9 = Label(self.topFrame, textvariable=self.stats.level,width=5,bg='#304366',relief='groove').grid(row=0,column=11)
-        self.label10 = Label(self.topFrame, textvariable=self.stats.h_level,width=5,bg='#304366',relief='groove').grid(row=1,column=11)
-
+        self.label7 = Label(self.canvas1, image=image07,bd=0,activebackground='#162032',bg='#304366').grid(row=0,column=11,sticky='nse')
+        self.label8 = Label(self.canvas1, image=image08,bd=0,activebackground='#162032',bg='#304366').grid(row=2,column=11,sticky='nse')
+        self.label9 = Label(self.canvas1, textvariable=self.stats.level,bg='#304346',relief='ridge',bd=2).grid(row=0,column=12,sticky='nswe')
+        self.label10 = Label(self.canvas1, textvariable=self.stats.h_level,bg='#304346',relief='ridge',bd=2).grid(row=2,column=12,sticky='nswe')
+        ## border
+        self.border8 = Label(self.canvas1, bg='#304366',bd=0).grid(row=0,column=13,sticky='nswe')
+        self.border9 = Label(self.canvas1, bg='#304366',bd=0).grid(row=2, column=13, sticky='nswe')
         # Canvas for game
         self.canvas = Canvas(self.master, width=500,height=550,bd=2,highlightthickness=1,bg="#304346",highlightbackground="#8BA16E",relief=SUNKEN)
         self.canvas.pack()
@@ -255,6 +268,10 @@ image05 = PhotoImage(file="images/speed.gif")
 image06 = PhotoImage(file="images/points.gif")
 image07 = PhotoImage(file="images/level.gif")
 image08 = PhotoImage(file="images/hlevel.gif")
+image09 = ImageTk.PhotoImage(Image.open("images/border01.jpg"))
+image10 = ImageTk.PhotoImage(Image.open("images/border02.jpg"))
+image11 = ImageTk.PhotoImage(Image.open("images/border03.jpg"))
+image12 = ImageTk.PhotoImage(Image.open("images/border04.jpg"))
 
 #Create gui and stats object
 stats = Stats()
