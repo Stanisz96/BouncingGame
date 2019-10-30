@@ -1,6 +1,6 @@
 from tkinter import *
 from PIL import ImageTk,Image
-import tkinter.messagebox
+import tkinter.messagebox as tm
 import time
 import datetime
 import random
@@ -68,9 +68,17 @@ class GUI(Stats):
         super().__init__()
         self.master = master
         self.stats = stats
-        # Properly closed window
+        # Variable
+        self.stop = 1
         self.x = True
+        # Properly closed window
         self.master.protocol("WM_DELETE_WINDOW", self.update_x)
+        # Menu
+        self.menubar = Menu(self.master)
+        self.menubar.add_command(label="Login",command=self.login)
+        self.menubar.add_command(label="Pause", command=self.pause)
+
+        self.master.config(menu=self.menubar)
         # Top frame with informations
         self.topFrame = Frame(self.master,bd=1,bg='#304366')
         self.topFrame.pack(fill=X)
@@ -127,6 +135,49 @@ class GUI(Stats):
     def newGame(self):
         self.new_Game = True
 
+    def login(self):
+        self.pause()
+        self.window = Toplevel(self.master)
+        self.window.attributes("-topmost", True)
+        self.window.protocol("WM_DELETE_WINDOW", lambda:self.winDestroy(self.window))
+        self.window.title("Login")
+        self.window.maxsize(300,300)
+        ## Frame
+        self.Frame = Frame(self.window)
+        self.Frame.pack(fill=X)
+        # Frame content
+        self.label_username = Label(self.Frame, text="Username")
+        self.label_password = Label(self.Frame, text="Password")
+
+        self.entry_username = Entry(self.Frame)
+        self.entry_password = Entry(self.Frame, show="*")
+
+        self.label_username.grid(row=0, sticky=E)
+        self.label_password.grid(row=1, sticky=E)
+        self.entry_username.grid(row=0, column=1)
+        self.entry_password.grid(row=1, column=1)
+
+        self.checkbox = Checkbutton(self.Frame, text="Keep me logged in")
+        self.checkbox.grid(columnspan=2)
+
+        self.logbutton = Button(self.Frame, text="Login", command=self.loginCheck)
+        self.logbutton.grid(columnspan=2)
+        self.Frame.pack()
+
+    def loginCheck(self):
+        username = self.entry_username.get()
+        password = self.entry_password.get()
+
+        if username == "stanisz" and password == "stanisz":
+            tm.showinfo("Login info", "Welcome Stanisz")
+            self.winDestroy(self.window)
+        else:
+            tm.showerror("Login error", "Incorrect username")
+    def pause(self):
+        self.stop *= -1
+    def winDestroy(self,win):
+        win.destroy()
+        self.pause()
 
 class Ball(Stats):
     def __init__(self, canvas, color, paddle, stats):
@@ -166,7 +217,7 @@ class Ball(Stats):
             self.x = 0
             self.y = 0
             self.stats.saveData()
-            tkinter.messagebox.showinfo(message="GAME OVER!")
+            tm.showinfo(message="GAME OVER!")
         if ball_pos[0] <= 0:
             self.x = int(self.stats.speed.get()) / 10
         if ball_pos[2] >= self.canvas_width:
@@ -252,12 +303,20 @@ class Paddle:
         else:
             self.y = 0
 
-
 # Main window for application
 root = Tk()
 root.title("Bounce!")
 root.resizable(0, 0)
-root.wm_attributes('-topmost', 1)
+root.wm_attributes('-topmost', False)
+
+width_win = 500
+height_win = 655
+screen_width = root.winfo_screenwidth()
+screen_height = root.winfo_screenheight()
+x_coordinate = (screen_width/2) - (width_win/2)
+y_coordinate = (screen_height/2) - (height_win/2)
+
+root.geometry("%dx%d+%d+%d" % (width_win,height_win,x_coordinate,y_coordinate))
 
 #Images
 image01 = PhotoImage(file="images/levelup.gif")
@@ -284,21 +343,25 @@ ball = Ball(gui.canvas,"red",paddle,stats)
 
 
 while gui.x == True:
-    if gui.new_Game == True:
-        #delate objects and reset variable
-        del ball, paddle
-        gui.canvas.delete("all")
-        stats.reset()
-        #create new objects
-        paddle = Paddle(gui.canvas, "green")
-        ball = Ball(gui.canvas, "red", paddle,stats)
-        gui.new_Game = False
-    ball.hit_paddle()
-    if ball.add_points == True:
-        stats.addPoints()
-        stats.updateStats()
-    paddle.draw()
-    ball.draw()
+    if gui.stop == 1:
+        if gui.new_Game == True:
+            #delate objects and reset variable
+            del ball, paddle
+            gui.canvas.delete("all")
+            stats.reset()
+            #create new objects
+            paddle = Paddle(gui.canvas, "green")
+            ball = Ball(gui.canvas, "red", paddle,stats)
+            gui.new_Game = False
+        ball.hit_paddle()
+        if ball.add_points == True:
+            stats.addPoints()
+            stats.updateStats()
+        paddle.draw()
+        ball.draw()
+    elif gui.stop == -1:
+        pass
+
     gui.master.update_idletasks()
     gui.master.update()
     time.sleep(0.02)
