@@ -5,9 +5,18 @@ import time
 import datetime
 import random
 import pandas as pd
+import os.path
 
 
+def centralize(win,width,height):
+    width_win = width
+    height_win = height
+    screen_width = win.winfo_screenwidth()
+    screen_height = win.winfo_screenheight()
+    x_coordinate = (screen_width / 2) - (width_win / 2)
+    y_coordinate = (screen_height / 2) - (height_win / 2)
 
+    win.geometry("%dx%d+%d+%d" % (width_win, height_win, x_coordinate, y_coordinate))
 
 
 class Stats:
@@ -44,24 +53,47 @@ class Stats:
         if int(self.level.get()) > int(self.h_level.get()):
             self.h_level.set(self.level.get())
 
-    def readData(self):
-        try:
-            file = pd.read_table('data.csv',delimiter=',')
-            self.h_score.set(file.get('Score').max())
-            self.h_level.set(file.get('Level').max())
-        except:
-            file = pd.DataFrame({'Score': [self.score.get()],
-                                'Level': [self.level.get()],
-                                'Data': [datetime.date.today()]})
-            file.to_csv("data.csv",index=False)
-    def saveData(self):
-        try:
-            file = pd.DataFrame({'Score': [self.score.get()],
-                                 'Level': [self.level.get()],
-                                 'Data': [datetime.date.today()]})
-            file.to_csv("data.csv", index=False, mode='a', header=False)
-        except:
-            print("ERROR!")
+    def statsData(self,mode):
+        if mode == "read":
+            try:
+                file = pd.read_table('data.csv',delimiter=',')
+                self.h_score.set(file.get('Score').max())
+                self.h_level.set(file.get('Level').max())
+            except:
+                file = pd.DataFrame({'Score': [self.score.get()],
+                                    'Level': [self.level.get()],
+                                    'Data': [datetime.date.today()]})
+                file.to_csv("data.csv",index=False)
+        if mode == "save":
+            try:
+                file = pd.DataFrame({'Score': [self.score.get()],
+                                     'Level': [self.level.get()],
+                                     'Data': [datetime.date.today()]})
+                file.to_csv("data.csv", index=False, mode='a', header=False)
+            except:
+                print("ERROR!")
+
+    def accountData(self, mode, nick, password):
+        if mode == "read":
+            try:
+                file = pd.read_table('accdata.csv',delimiter=',')
+                file.dropna(inplace = True)
+                file = file[file['Nick'] == nick]['Password'].get(0)
+                #print(file)
+                return file
+            except:
+                print("No account created")
+        if mode == "save":
+            try:
+                file = pd.DataFrame({'Nick': [nick],
+                                    'Password': [password],
+                                    'Data': [datetime.date.today()]})
+                if os.path.exists('accdata.csv'):
+                    file.to_csv("accdata.csv", index=False, mode='a', header=False)
+                else:
+                    file.to_csv("accdata.csv", index=False, mode='a')
+            except:
+                print("Can't create account")
 
 class GUI(Stats):
     def __init__(self, master, stats):
@@ -75,8 +107,13 @@ class GUI(Stats):
         self.master.protocol("WM_DELETE_WINDOW", self.update_x)
         # Menu
         self.menubar = Menu(self.master)
-        self.menubar.add_command(label="Login",command=self.login)
-        self.menubar.add_command(label="Pause", command=self.pause)
+        ## Account
+        self.account = Menu(self.menubar, tearoff=0)
+        self.account.add_command(label="Login",command=self.login)
+        self.account.add_command(label="Registration", command=self.registration)
+        self.menubar.add_cascade(label="Account", menu=self.account)
+        ## Pause
+        self.menubar.add_command(label="Pause", command=lambda:self.pause("change"))
 
         self.master.config(menu=self.menubar)
         # Top frame with informations
@@ -136,15 +173,17 @@ class GUI(Stats):
         self.new_Game = True
 
     def login(self):
-        self.pause()
-        self.window = Toplevel(self.master)
-        self.window.attributes("-topmost", True)
-        self.window.protocol("WM_DELETE_WINDOW", lambda:self.winDestroy(self.window))
-        self.window.title("Login")
-        self.window.maxsize(300,300)
+        self.master.attributes("-disabled",1)
+        self.pause("stop")
+        self.logWindow = Toplevel(self.master,width=1,height=1)
+        self.logWindow.lift()
+        centralize(self.logWindow,200,140)
+        self.logWindow.protocol("WM_DELETE_WINDOW", lambda:self.winDestroy(self.logWindow))
+        self.logWindow.title("Login")
+        self.logWindow.resizable(0,0)
         ## Frame
-        self.Frame = Frame(self.window)
-        self.Frame.pack(fill=X)
+        self.Frame = Frame(self.logWindow)
+        self.Frame.pack(pady=20)
         # Frame content
         self.label_username = Label(self.Frame, text="Username")
         self.label_password = Label(self.Frame, text="Password")
@@ -168,16 +207,71 @@ class GUI(Stats):
         username = self.entry_username.get()
         password = self.entry_password.get()
 
-        if username == "stanisz" and password == "stanisz":
-            tm.showinfo("Login info", "Welcome Stanisz")
-            self.winDestroy(self.window)
+        if password == self.stats.accountData("read",username,password):
+            tm.showinfo("Login info", "Welcome "+username)
+            self.winDestroy(self.logWindow)
+            self.master.attributes("-disabled", 0)
+            self.master.title(username)
         else:
+            tm.showerror("Login error", "Incorrect username or password")
+            self.logWindow.lift()
+
+    def registration(self):
+        self.master.attributes("-disabled",1)
+        self.pause("stop")
+        self.registWindow = Toplevel(self.master,width=1,height=1)
+        self.registWindow.lift()
+        centralize(self.registWindow,200,140)
+        self.registWindow.protocol("WM_DELETE_WINDOW", lambda:self.winDestroy(self.registWindow))
+        self.registWindow.title("Login")
+        self.registWindow.resizable(0,0)
+        ## Frame
+        self.Frame2 = Frame(self.registWindow)
+        self.Frame2.pack(pady=20)
+        # Frame content
+        self.label_username = Label(self.Frame2, text="Username")
+        self.label_password = Label(self.Frame2, text="Password")
+
+        self.entry_username = Entry(self.Frame2)
+        self.entry_password = Entry(self.Frame2, show="*")
+
+        self.label_username.grid(row=0, sticky=E)
+        self.label_password.grid(row=1, sticky=E)
+        self.entry_username.grid(row=0, column=1)
+        self.entry_password.grid(row=1, column=1)
+
+        self.checkbox = Checkbutton(self.Frame2, text="Show signs")
+        self.checkbox.grid(columnspan=2)
+
+        self.logbutton = Button(self.Frame2, text="Register", command=self.registrationCheck)
+        self.logbutton.grid(columnspan=2)
+        self.Frame2.pack()
+
+    def registrationCheck(self):
+        username = self.entry_username.get()
+        password = self.entry_password.get()
+
+        if password == None:
             tm.showerror("Login error", "Incorrect username")
-    def pause(self):
-        self.stop *= -1
+            self.registWindow.lift()
+        else:
+            self.stats.accountData("save",username,password)
+            tm.showinfo("Successful registration", "Registration complete! Please login :)")
+            self.winDestroy(self.registWindow)
+            self.master.attributes("-disabled", 0)
+
+    def pause(self,option):
+        if option == "start":
+            self.stop = 1
+        if option == "stop":
+            self.stop = -1
+        if option == "change":
+            self.stop *= -1
     def winDestroy(self,win):
+        self.master.attributes("-disabled", 0)
         win.destroy()
-        self.pause()
+        self.pause("start")
+
 
 class Ball(Stats):
     def __init__(self, canvas, color, paddle, stats):
@@ -216,7 +310,7 @@ class Ball(Stats):
             self.canvas.coords(self.id,[244,44,256,56])
             self.x = 0
             self.y = 0
-            self.stats.saveData()
+            self.stats.statsData("save")
             tm.showinfo(message="GAME OVER!")
         if ball_pos[0] <= 0:
             self.x = int(self.stats.speed.get()) / 10
@@ -308,15 +402,7 @@ root = Tk()
 root.title("Bounce!")
 root.resizable(0, 0)
 root.wm_attributes('-topmost', False)
-
-width_win = 500
-height_win = 655
-screen_width = root.winfo_screenwidth()
-screen_height = root.winfo_screenheight()
-x_coordinate = (screen_width/2) - (width_win/2)
-y_coordinate = (screen_height/2) - (height_win/2)
-
-root.geometry("%dx%d+%d+%d" % (width_win,height_win,x_coordinate,y_coordinate))
+centralize(root,500,655)
 
 #Images
 image01 = PhotoImage(file="images/levelup.gif")
@@ -334,7 +420,7 @@ image12 = ImageTk.PhotoImage(Image.open("images/border04.jpg"))
 
 #Create gui and stats object
 stats = Stats()
-stats.readData()
+stats.statsData("read")
 gui = GUI(root, stats)
 root.update()
 #Create paddle and ball
