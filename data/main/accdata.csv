@@ -1,3 +1,6 @@
-Id,Username,Password,Data
-001,user,pass,2019-10-31
-002,user1,pass,2019-10-31
+Id,Username,Password,Data,HostName,HostID
+000,Guest,,2019-11-03,Staniszworld,192.168.56.1
+001,user,pass,2019-11-03,Staniszworld,192.168.56.1
+002,user1,pass1,2019-11-03,Staniszworld,192.168.56.1
+003,user2,pass2,2019-11-03,Staniszworld,192.168.56.1
+004,user3,pass3,2019-11-03,Staniszworld,192.168.56.1

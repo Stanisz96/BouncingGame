@@ -3,12 +3,11 @@
   <component name="ChangeListManager">
     <list default="true" id="216b688e-4dbb-4ed7-aabe-0b7de98ca7e1" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/accdata.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/individual/001.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/individual/001.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/individual/002.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/individual/002.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/main/accdata.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/main/accdata.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/main/data.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/main/data.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/game.py" beforeDir="false" afterPath="$PROJECT_DIR$/game.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/border01.gif" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/border01.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/images/border01.png" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />

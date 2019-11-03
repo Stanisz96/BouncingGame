@@ -6,6 +6,10 @@ import datetime
 import random
 import pandas as pd
 import os.path
+import socket
+
+host_name = socket.gethostname()
+host_id = socket.gethostbyname(host_name)
 
 
 def centralize(win,width,height):
@@ -23,12 +27,15 @@ class Stats:
     def __init__(self):
         self.username = StringVar()
         self.username.set('Guest')
+
         self.score = StringVar()
         self.score.set('0')
         self.speed = StringVar()
         self.speed.set('40')
         self.level = StringVar()
         self.level.set('0')
+        self.level_passed = StringVar()
+        self.level_passed.set('0')
         self.points = StringVar()
         self.points.set('10')
         self.h_score = StringVar()
@@ -36,14 +43,19 @@ class Stats:
         self.h_level = StringVar()
         self.h_level.set('0')
 
+        self.game_state = StringVar()
+        self.game_state.set('stop')
+
     def reset(self):
         self.score.set('0')
         self.speed.set('40')
         self.level.set('0')
+        self.level_passed.set('0')
         self.points.set('10')
 
     def addPoints(self):
         self.score.set(str(int(self.score.get()) + int(self.points.get())))
+        self.level_passed.set(self.level.get())
 
     def levelUp(self):
         self.speed.set(str(int(self.speed.get()) + 1))
@@ -59,23 +71,27 @@ class Stats:
 
     def mainData(self,mode,username=None,password=None):
         if mode == "read_stats":
-            try:
+            if os.path.exists('./data/main/data.csv'):
                 file = pd.read_table('./data/main/data.csv',delimiter=',')
                 self.h_score.set(file.get('Score').max())
                 self.h_level.set(file.get('Level').max())
-            except:
-                file = pd.DataFrame({'Score': [self.score.get()],
-                                    'Level': [self.level.get()],
-                                    'Data': [datetime.date.today()],
-                                     'Username': [username]})
+            else:
+                file = pd.DataFrame({'Score': [],
+                                    'Level': [],
+                                    'Data': [],
+                                    'Username': [],
+                                    'HostName': [],
+                                    'HostID': []})
                 file.to_csv("./data/main/data.csv",index=False)
 
         if mode == "save_stats":
             try:
                 file = pd.DataFrame({'Score': [self.score.get()],
-                                     'Level': [self.level.get()],
+                                     'Level': [self.level_passed.get()],
                                      'Data': [datetime.date.today()],
-                                     'Username': [username]})
+                                     'Username': [username],
+                                     'HostName': [host_name],
+                                     'HostID': [host_id]})
                 file.to_csv("./data/main/data.csv", index=False, mode='a', header=False)
             except:
                 print("ERROR!")
@@ -98,14 +114,19 @@ class Stats:
                     file = pd.DataFrame({'Id': [idAccount],
                                     'Username': [username],
                                     'Password': [password],
-                                    'Data': [datetime.date.today()]})
+                                    'Data': [datetime.date.today()],
+                                    'HostName': [host_name],
+                                    'HostID': [host_id]})
                     file.to_csv("./data/main/accdata.csv", index=False, mode='a', header=False)
                 else:
-                    file = pd.DataFrame({'Id': ['001'],
+                    file = pd.DataFrame({'Id': ['000'],
                                  'Username': [username],
                                  'Password': [password],
-                                 'Data': [datetime.date.today()]})
+                                 'Data': [datetime.date.today()],
+                                 'HostName': [host_name],
+                                 'HostID': [host_id]})
                     file.to_csv("./data/main/accdata.csv", index=False, mode='a')
+
             except:
                 print("Can't create account")
 
@@ -119,7 +140,9 @@ class Stats:
 
                 file = pd.DataFrame({'Score': [],
                                      'Level': [],
-                                     'Data': []})
+                                     'Data': [],
+                                    'HostName': [],
+                                    'HostID': []})
                 file.to_csv("./data/individual/" + idAccount + ".csv", index=False, mode='a')
             except:
                 pass
@@ -130,8 +153,10 @@ class Stats:
                 idAccount = str(idAccount).zfill(3)
 
                 file = pd.DataFrame({'Score': [self.score.get()],
-                                     'Level': [self.level.get()],
-                                     'Data': [datetime.date.today()]})
+                                     'Level': [self.level_passed.get()],
+                                     'Data': [datetime.date.today()],
+                                    'HostName': [host_name],
+                                    'HostID': [host_id]})
                 file.to_csv("./data/individual/" + idAccount + ".csv", index=False, mode='a', header=False)
 
 
@@ -155,9 +180,11 @@ class GUI(Stats):
         self.account.add_command(label="Registration", command=self.registration)
         self.menubar.add_cascade(label="Account", menu=self.account)
         ## Pause
-        self.menubar.add_command(label="Pause", command=lambda:self.pause("change"))
+        self.menubar.add_command(label="Pause",command=lambda:self.pause("change"))
         ## Set menu visible
         self.master.config(menu=self.menubar)
+
+
 
         # Top frame with informations
         self.topFrame = Frame(self.master,bd=2,bg='#304366')
@@ -201,9 +228,14 @@ class GUI(Stats):
         self.canvas.pack()
 
     def update_x(self):
+        self.stats.mainData("save_stats", self.stats.username.get())
+        self.stats.individualData("save", self.stats.username.get())
         self.x = False
 
     def newGame(self):
+        self.stats.mainData("save_stats", self.stats.username.get())
+        self.stats.individualData("save", self.stats.username.get())
+        self.pause("start")
         self.new_Game = True
 
     def login(self):
@@ -249,9 +281,35 @@ class GUI(Stats):
             self.winDestroy(self.logWindow)
             self.master.attributes("-disabled", 0)
             self.master.title(username)
+            self.master.after(1, lambda: self.master.focus_force())
+            self.newGame()
+            # Change menu
+            self.menubar.delete(1)
+            self.menubar.delete(1)
+            self.menubar.add_command(label="Logout",command=self.logout)
+            self.menubar.add_command(label="Pause", command=lambda: self.pause("change"))
+            # self.account.delete(0)
+            # self.account.delete(0)
+            # self.menubar.entryconfig("Account",label="Logout")
+            # self.menubar.entryconfig("Logout", command=self.logout)
+
         else:
             tm.showerror("Login error", "Incorrect username or password")
             self.logWindow.lift()
+
+    def logout(self):
+        logout_ask = tm.askquestion("Logout","Are you sure you want to logout?")
+        if logout_ask == 'yes':
+            self.menubar.delete(1)
+            self.menubar.delete(1)
+            self.menubar.add_cascade(label="Account", menu=self.account)
+            self.menubar.add_command(label="Pause", command=lambda: self.pause("change"))
+
+            self.stats.username.set("Guest")
+            self.master.title("Guest")
+            self.newGame()
+        else:
+            pass
 
     def registration(self):
         # Setup main configuation
@@ -299,8 +357,10 @@ class GUI(Stats):
             tm.showinfo("Successful registration", "Registration complete! Please login :)")
             self.winDestroy(self.registWindow)
             self.master.attributes("-disabled", 0)
+            self.master.after(1, lambda: self.master.focus_force())
 
     def pause(self,option):
+        self.stats.game_state.set(option)
         if option == "start":
             self.stop = 1
         if option == "stop":
@@ -311,7 +371,8 @@ class GUI(Stats):
     def winDestroy(self,win):
         self.master.attributes("-disabled", 0)
         win.destroy()
-        self.pause("start")
+        self.newGame()
+        self.pause("stop")
 
 
 class Ball(Stats):
@@ -451,6 +512,7 @@ class Paddle:
 
 # Main window for application
 root = Tk()
+#root.overrideredirect(1)
 root.title("Bounce!")
 root.resizable(0, 0)
 root.wm_attributes('-topmost', False)
@@ -469,25 +531,35 @@ image10 = ImageTk.PhotoImage(Image.open("images/border02.jpg"))
 image11 = ImageTk.PhotoImage(Image.open("images/border03.jpg"))
 image12 = ImageTk.PhotoImage(Image.open("images/border04.jpg"))
 
-#Create gui and stats object
+
+# Create gui and stats object
 stats = Stats()
-stats.mainData("read_stats")
+stats.mainData("read_stats",stats.username.get())
 gui = GUI(root, stats)
 root.update()
 
-#Create paddle and ball
+# Create paddle and ball
 paddle = Paddle(gui.canvas,"green")
 ball = Ball(gui.canvas,"red",paddle,stats)
 
+# Create guest accout
+if os.path.exists('./data/main/accdata.csv'):
+    root.title(stats.username.get())
+else:
+    stats.mainData("save_account", stats.username.get())
+    stats.individualData("create", stats.username.get())
+    root.title(stats.username.get())
+
+gui.pause("stop")
 
 while gui.x == True:
     if gui.stop == 1:
         if gui.new_Game == True:
-            #delate objects and reset variable
+            # delate objects and reset variable
             del ball, paddle
             gui.canvas.delete("all")
             stats.reset()
-            #create new objects
+            # create new objects
             paddle = Paddle(gui.canvas, "green")
             ball = Ball(gui.canvas, "red", paddle,stats)
             gui.new_Game = False
